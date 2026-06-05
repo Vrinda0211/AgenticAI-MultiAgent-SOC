@@ -1,0 +1,43 @@
+{
+  "techniques":[
+    {
+      "id": "T1110",
+      "name": "Brute Force",
+      "description": "Adversaries may use brute force techniques to gain access to accounts when passwords are unknown or when password hashes are obtained. Brute forcing passwords can take place via interaction with a service that will check the validity of those credentials.",
+      "detection": "Monitor authentication logs for repeated failed login attempts from the same source IP in a short time window.",
+      "mitigations": [
+        "Account lockout policies",
+        "Multi-factor authentication",
+        "Block repeated failed login attempts at the firewall",
+        "Monitor and alert on abnormal authentication activity"
+      ],
+      "tactic": "Credential Access"
+    },
+    {
+      "id": "T1046",
+      "name": "Network Service Discovery / Port Scan",
+      "description": "Adversaries may attempt to get a listing of services running on remote hosts and local network infrastructure devices by scanning ports to identify open services and potential vulnerabilities.",
+      "detection": "Monitor network traffic for rapid sequential connection attempts across multiple ports from a single source IP.",
+      "mitigations":[
+        "Use firewalls to block unsolicited connection attempts",
+        "Implement network intrusion detection systems",
+        "Monitor and alert on port scanning behavior",
+        "Segment networks to limit scanning scope"
+      ],
+      "tactic": "Discovery"
+    },
+    {
+      "id": "T1078",
+      "name": "Valid Accounts / Suspicious Login",
+      "description": "Adversaries may obtain and abuse credentials of existing accounts to gain initial access. Compromised credentials may be used to bypass access controls and gain access to systems.",
+      "detection": "Monitor for successful logins following multiple failed attempts from the same source IP, logins from unusual geolocations, or logins during off-hours targeting admin accounts.",
+      "mitigations": [
+        "Enforce multi-factor authentication",
+        "Monitor for anomalous account activity",
+        "Implement privileged account management",
+        "Review and audit account permissions regularly"
+      ],
+      "tactic": "Defense Evasion, Persistence, Privilege Escalation, Initial Access"
+    }
+  ]
+}
