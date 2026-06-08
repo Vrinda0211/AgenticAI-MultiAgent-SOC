@@ -29,7 +29,7 @@ def incident_history_tool(ip_address):
         unique_ports_scanned=port_records["destination_port"].nunique()
 
         auth_times=pd.to_datetime(auth_records["timestamp"])
-        port_times=pd.to_datetime(auth_records["timestamp"])
+        port_times=pd.to_datetime(port_records["timestamp"])
         all_times=pd.concat([auth_times,port_times])
         first_seen=all_times.min()
         last_seen=all_times.max()
@@ -43,13 +43,13 @@ def incident_history_tool(ip_address):
             "port_scan_events":port_events,
             "failed_logins": int(failed_auth_logs),
             "successful_logins": int(successful_auth_logs),
-            "unique_ports_scanned":unique_ports_scanned,
+            "unique_ports_scanned":int(unique_ports_scanned),
             "countries":countries,
             "first_seen":first_seen,
             "last_seen":last_seen,
             "found":True
         }
-        return 0
+       
 
 
 result = incident_history_tool('194.165.16.72')
