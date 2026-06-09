@@ -108,10 +108,6 @@ def historical_pattern_tool(ip_address):
 
             }
 
-
-    
-
-
     return {
         "ip_address":ip_address,
         "patterns_found":patterns_found,
