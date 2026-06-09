@@ -118,6 +118,3 @@ def historical_pattern_tool(ip_address):
     }
 
 
-#result = historical_pattern_tool('194.165.16.72')
-#result = historical_pattern_tool('10.10.10.10')
-#print(result)
