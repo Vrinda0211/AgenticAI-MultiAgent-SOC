@@ -1,0 +1,68 @@
+{
+    "Brute Force":{
+        "immediate_actions":[
+            "Block source IP at firewall",
+            "Lock targeted user account",
+            "Reset account password"
+        ],
+        "investigation_steps":[
+            "Check if any login succeeded after failures",
+            "Review all accounts targeted by this IP",
+            "Check for lateral movement after compromise"
+        ],
+        "preventive_measures":[
+            "Implement account lockout policy",
+            "Enable multi-factor authentication",
+            "Deploy fail2ban or similar tool"
+        ],
+        "escalate_if":[
+            "Successful login detected after brute force",
+            "Admin account targeted",
+            "Attack ongoing"
+        ]
+    },
+    "Port Scan":{
+        "immediate_actions":[
+            "Block source IP at firewall",
+            "Alert network security team",
+            "Review firewall rules for exposed ports"
+        ],
+        "investigation_steps":[
+            "Identify which ports were found open",
+            "Check if scanning IP attempted connections after scan",
+            "Correlate with auth logs for follow-on activity"
+        ],
+        "preventive_measures":[
+            "Close unnecessary open ports",
+            "Implement network segmentation",
+            "Deploy intrusion detection system"
+        ],
+        "escalate_if":[
+            "Open ports discovered on critical systems",
+            "Scanning IP appears in auth logs",
+            "Scan covers large port range in short time"
+        ]
+    },
+    "Suspicious Login":{
+        "immediate_actions":[
+            "Suspend compromised account immediately",
+            "Block source IP at firewall",
+            "Force password reset on affected account"
+        ],
+        "investigation_steps":[
+            "Review all actions taken after successful login",
+            "Check for data access or exfiltration",
+            "Identify all accounts accessed from this IP"
+        ],
+        "preventive_measures":[
+            "Enforce multi-factor authentication",
+            "Implement anomaly based login alerting",
+            "Review and tighten account access policies"
+        ],
+        "escalate_if":[
+            "Admin account compromised",
+            "Sensitive data accessed after login",
+            "Multiple accounts compromised"
+        ]
+    }
+}
