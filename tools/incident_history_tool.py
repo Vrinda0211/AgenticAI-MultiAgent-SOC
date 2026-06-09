@@ -52,5 +52,3 @@ def incident_history_tool(ip_address):
        
 
 
-result = incident_history_tool('194.165.16.72')
-print(result)

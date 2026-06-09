@@ -27,13 +27,3 @@ def escalation_tool(attack_type,severity,confidence,admin_targeted,successful_lo
         "reasons":reasons
     }
 
-result = escalation_tool(
-    attack_type="suspicious_login",
-    severity="High",
-    confidence=45,
-    admin_targeted=True,
-    successful_login=True,
-    score=90
-)
-
-print(result)
