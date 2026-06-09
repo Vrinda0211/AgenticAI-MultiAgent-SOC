@@ -49,8 +49,3 @@ def incident_history_tool(ip_address):
             "last_seen":last_seen,
             "found":True
         }
-       
-
-
-result = incident_history_tool('194.165.16.72')
-print(result)

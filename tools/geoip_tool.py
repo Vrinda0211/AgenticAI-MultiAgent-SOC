@@ -1,6 +1,9 @@
+from langchain_core.tools import tool
 import pandas as pd
 
-def geoip_tool(ip_address):
+@tool
+def geoip_tool(ip_address:str)->dict:
+    """Given a source IP address, returns the city and country location by looking up the IP in the auth and port scan logs."""
     df_auth=pd.read_csv('data/cleaned_logs/auth_logs_cleaned.csv')
     df_port=pd.read_csv('data/cleaned_logs/port_scan_logs_cleaned.csv')
     result=df_auth[df_auth["source_ip"]==ip_address]
