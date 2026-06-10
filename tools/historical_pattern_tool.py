@@ -1,7 +1,14 @@
+from langchain_core.tools import tool
 import pandas as pd
 from datetime import datetime, timedelta
 
-def historical_pattern_tool(ip_address):
+
+@tool
+def historical_pattern_tool(ip_address:str)->dict:
+    """Given a source IP address, analyzes behavioral patterns and detects which attack 
+    types are present — brute force, port scan, or suspicious login — based on the IP's 
+    activity across auth and port scan logs."""
+    
     df_auth=pd.read_csv('data/cleaned_logs/auth_logs_cleaned.csv')
     df_port=pd.read_csv('data/cleaned_logs/port_scan_logs_cleaned.csv')
     ip_address = str(ip_address).strip()
