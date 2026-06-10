@@ -6,6 +6,7 @@ from config import SUSPICIOUS_COUNTRIES, REPUTATION_WEIGHTS
 
 @tool
 def ip_reputation_tool(ip_address:str)->dict:
+    """Given a source IP address, calculates a reputation score from 0 to 100 based on failed logins, successful logins, ports scanned, suspicious country, and admin targeting. Higher score means more suspicious."""
     fail_count=0
     success_count=0
     df_auth=pd.read_csv('data/cleaned_logs/auth_logs_cleaned.csv')
