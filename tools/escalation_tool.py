@@ -1,4 +1,11 @@
-def escalation_tool(attack_type,severity,confidence,admin_targeted,successful_login,score):
+from langchain_core.tools import tool
+
+@tool
+def escalation_tool(attack_type: str,severity: str,confidence: int,admin_targeted: bool,successful_login: bool,score: int) -> dict:
+    
+    """Given the attack type, severity, confidence score, admin targeting status, successful login status, 
+    and reputation score, decides whether the incident should be escalated to a human analyst and returns 
+    the reasons for escalation."""
     reasons=[]
     if severity=='Critical' :
         reasons.append("Severity of threat is Critical")
