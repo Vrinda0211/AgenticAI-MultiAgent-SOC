@@ -1,6 +1,12 @@
+from langchain_core.tools import tool
 import pandas as pd
 
-def incident_history_tool(ip_address):
+@tool
+def incident_history_tool(ip_address:str)->dict:
+    """Given a source IP address, retrieves the complete history of all events associated 
+    with that IP from both auth logs and port scan logs, including failed logins, successful
+    logins, ports scanned, and timestamps."""
+    
     df_auth=pd.read_csv('data/cleaned_logs/auth_logs_cleaned.csv')
     df_port=pd.read_csv('data/cleaned_logs/port_scan_logs_cleaned.csv')
 
