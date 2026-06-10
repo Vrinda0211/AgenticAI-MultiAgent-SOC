@@ -1,9 +1,11 @@
+from langchain_core.tools import tool
 import pandas as pd
 import sys
 sys.path.append('.')
 from config import SUSPICIOUS_COUNTRIES, REPUTATION_WEIGHTS
 
-def ip_reputation_tool(ip_address):
+@tool
+def ip_reputation_tool(ip_address:str)->dict:
     fail_count=0
     success_count=0
     df_auth=pd.read_csv('data/cleaned_logs/auth_logs_cleaned.csv')
@@ -43,6 +45,3 @@ def ip_reputation_tool(ip_address):
         "suspicious_country":sus_country,
         "admin_targeted":admin_targeted
     }
-
-print(ip_reputation_tool("194.165.16.72"))
-print(ip_reputation_tool("999.999.999.999"))
