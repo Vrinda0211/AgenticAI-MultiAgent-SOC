@@ -14,7 +14,7 @@ load_dotenv()
 
 llm=ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
-    google_api_key=os.getenv("GOOGLE_API_KEY"),
+    google_api_key=os.getenv("GEMINI_API_KEY"),
     temperature=0
 )
 tools=[mitre_lookup_tool,historical_pattern_tool,incident_history_tool]
@@ -71,6 +71,14 @@ Determine the attack type, gather evidence, and map to MITRE ATT&CK.
     if isinstance(final_message,list):
         final_message=final_message[0]["text"]
     state["investigation_reasoning"]=final_message
+    state["confidence_investigation"]=100
+    state["attack_type"]=""
+    state["primary_mitre_id"]=""
+    state["secondary_mitre_id"]=""
+    state["evidence"]=""
+    if "RETRIAGE NEEDED" in final_message:
+        state["retriage_count"]=state.get("retriage_count",0)+1
+        state["confidence_investigation"]=50
+    else:
+        state["confidence_investigation"]=100
     return state
-
-

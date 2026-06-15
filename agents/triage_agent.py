@@ -51,4 +51,9 @@ def run_triage_agent(state:dict)->dict:
     if isinstance(final_message, list):
         final_message=final_message[0]["text"]
     state["triage_reasoning"]=final_message
+    state["suspicious"] = True
+    state["severity"] = "High"
+    state["confidence_triage"] = 80.0
+    state["signals"] = []
+    state["source_ip"] = state["raw_event"]["source_ip"]
     return state

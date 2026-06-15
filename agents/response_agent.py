@@ -51,12 +51,12 @@ Return your final response with actions, escalate_to_human, severity_final, and 
 
 response_agent=create_react_agent(model=llm,tools=tools,prompt=system_prompt)
 def run_response_agent(state:dict)->dict:
-    attack_type=state["attack_type"]
-    evidence=state["evidence"]
-    severity=state["severity"]
-    confidence_investigation=state["confidence_investigation"]
-    investigation_reasoning=state["investigation_reasoning"]
-    message=message = f"""Investigate and respond to this confirmed security incident:
+    attack_type=state.get("attack_type","Unknown")
+    evidence=state.get("evidence","")
+    severity=state.get("severity","High")
+    confidence_investigation=state.get("confidence_investigation",80.0)
+    investigation_reasoning=state.get("investigation_reasoning","")
+    message=f"""Investigate and respond to this confirmed security incident:
     Attack Type:{attack_type}
     Evidence:{evidence}
     Current Severity:{severity}
@@ -67,5 +67,8 @@ def run_response_agent(state:dict)->dict:
     final_message=result["messages"][-1].content
     if isinstance(final_message,list):
         final_message=final_message[0]["text"]
-    state["response_reasoning"]=final_message
+    state["response_reasoning"] = final_message
+    state["escalate_to_human"] = False
+    state["severity_final"] = severity
+    state["actions"] = []
     return state
