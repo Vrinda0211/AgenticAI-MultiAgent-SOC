@@ -9,6 +9,7 @@ from tools.historical_pattern_tool import historical_pattern_tool
 from tools.incident_history_tool import incident_history_tool
 import warnings
 import re
+import json
 warnings.filterwarnings("ignore")
 
 load_dotenv()
@@ -47,13 +48,15 @@ If confidence is below 60, explicitly state:
 
 Always call all relevant tools before making a decision. Never guess without tool results.
 
-Return your final assessment clearly stating:
-- attack_type
-- primary_mitre_id and what it represents
-- secondary_mitre_id (if applicable, else None)
-- evidence gathered from tools
-- confidence score (0-100)
-- investigation_reasoning explaining your full analysis
+Return your response as valid JSON only, with no extra text before or after:
+{
+    "attack_type": "Brute Force",
+    "primary_mitre_id": "T1110",
+    "secondary_mitre_id": "T1078",
+    "evidence": "235 failed logins, 1 successful login, admin account targeted",
+    "confidence_score": 95,
+    "investigation_reasoning": "Your explanation here"
+}
 
 """
 
@@ -71,42 +74,29 @@ Determine the attack type, gather evidence, and map to MITRE ATT&CK.
     final_message=result["messages"][-1].content
     if isinstance(final_message,list):
         final_message=final_message[0]["text"]
-    state["investigation_reasoning"]=final_message
-
-    attack_match=re.search(r'attack_type[:\s]+(.+)', final_message, re.IGNORECASE)
-    if attack_match:
-        state["attack_type"]=attack_match.group(1).strip()
-    else:
+    clean_message=final_message.strip()
+    if clean_message.startswith("```"):
+        clean_message=re.sub(r'```json|```','',clean_message).strip()
+    try:
+        parsed=json.loads(clean_message)
+        state["investigation_reasoning"]=parsed.get("investigation_reasoning",final_message)
+        state["attack_type"]=parsed.get("attack_type","Unknown")
+        state["primary_mitre_id"]=parsed.get("primary_mitre_id","")
+        state["secondary_mitre_id"]=parsed.get("secondary_mitre_id","")
+        state["evidence"]=parsed.get("evidence","")
+        state["confidence_investigation"]=float(parsed.get("confidence_score",100))
+    except:
+        state["investigation_reasoning"]=final_message
         state["attack_type"]="Unknown"
-
-    primary_match = re.search(r'primary_mitre_id[:\s]+(T\d+)', final_message, re.IGNORECASE)
-    state["primary_mitre_id"] = primary_match.group(1).upper() if primary_match else "None"
-
-    # --- secondary_mitre_id (can have multiple IDs) ---
-    secondary_match = re.search(r'secondary_mitre_id[:\s]+(.+)', final_message, re.IGNORECASE)
-    if secondary_match:
-        secondary_ids = re.findall(r'T\d+', secondary_match.group(1), re.IGNORECASE)
-        state["secondary_mitre_id"] = ", ".join(secondary_ids) if secondary_ids else "None"
-    else:
-        state["secondary_mitre_id"] = "None"
-
-    # --- evidence (multi-line, stops before confidence_score) ---
-    evidence_match = re.search(
-        r'evidence[a-z_\s]*[:\s]+(.+?)(?=confidence[_\s]*score|investigation_reasoning|$)',
-        final_message, re.IGNORECASE | re.DOTALL
-    )
-    state["evidence"] = evidence_match.group(1).strip() if evidence_match else "No evidence extracted"
-
-    confidence_match=re.search(r'confidence[_\s]*score[:\s]+(\d+)',final_message,re.IGNORECASE)
-    if confidence_match:
-        state["confidence_investigation"]=float(confidence_match.group(1))
-    else:
+        state["primary_mitre_id"]=""
+        state["secondary_mitre_id"]=""
+        state["evidence"]=""
         state["confidence_investigation"]=100.0
-    if "RETRIAGE NEEDED" in final_message:
+    if "RETRIAGE NEEDED" in state["investigation_reasoning"]:
         state["retriage_count"]=state.get("retriage_count",0)+1
-        state["retriage_request"]=final_message
+        state["retriage_request"]=state["investigation_reasoning"]
+        state["confidence_investigation"]=50.0
     else:
         state["retriage_request"]=""
-    
     return state
     

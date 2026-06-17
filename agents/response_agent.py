@@ -10,6 +10,8 @@ from tools.remediation_kb_tool import remediation_kb_tool
 
 import warnings
 warnings.filterwarnings('ignore')
+import re
+import json
 
 load_dotenv()
 
@@ -47,7 +49,15 @@ Final severity rules:
 
 Never return generic playbook responses. Every action must reference specific evidence from the investigation.
 
-Return your final response with actions, escalate_to_human, severity_final, and reasoning clearly stated."""
+You MUST return your final response as a valid JSON object with NO markdown, NO extra text, NOTHING outside the JSON.
+The JSON must follow this exact structure:
+{
+    "actions": ["action 1", "action 2", "action 3"],
+    "escalate_to_human": true,
+    "severity_final": "Critical",
+    "response_reasoning": "your reasoning here"
+}
+"""
 
 response_agent=create_react_agent(model=llm,tools=tools,prompt=system_prompt)
 def run_response_agent(state:dict)->dict:
@@ -67,8 +77,18 @@ def run_response_agent(state:dict)->dict:
     final_message=result["messages"][-1].content
     if isinstance(final_message,list):
         final_message=final_message[0]["text"]
-    state["response_reasoning"] = final_message
-    state["escalate_to_human"] = False
-    state["severity_final"] = severity
-    state["actions"] = []
+    try:
+       cleaned = final_message.strip()
+       if cleaned.startswith("```"):
+         cleaned = re.sub(r'```json|```', '', cleaned).strip()
+       parsed = json.loads(cleaned)
+       state["actions"] = [{"action": a} for a in parsed.get("actions", [])]
+       state["escalate_to_human"] = bool(parsed.get("escalate_to_human", False))
+       state["severity_final"] = parsed.get("severity_final", severity)
+       state["response_reasoning"] = parsed.get("response_reasoning", final_message)
+    except:
+       state["actions"] = []
+       state["escalate_to_human"] = False
+       state["severity_final"] = severity
+       state["response_reasoning"] = final_message
     return state

@@ -11,6 +11,8 @@ from tools.ip_reputation_tool import ip_reputation_tool
 
 import warnings
 warnings.filterwarnings("ignore")
+import re
+import json
 
 load_dotenv()
 
@@ -40,7 +42,15 @@ Severity rules:
 
 Always call all three tools before making a decision. Never guess without tool results.
 
-Return your final assessment as a structured summary with suspicious, severity, confidence, signals, and reasoning clearly stated."""
+Return your response as valid JSON only, with no extra text before or after:
+{
+    "suspicious": true,
+    "severity": "Critical",
+    "confidence": 95,
+    "signals": ["repeat_ip", "suspicious_country"],
+    "reasoning": "Your explanation here"
+}
+"""
 
 triage_agent=create_react_agent(model=llm,tools=tools,prompt=system_prompt)
 def run_triage_agent(state:dict)->dict:
@@ -51,9 +61,21 @@ def run_triage_agent(state:dict)->dict:
     if isinstance(final_message, list):
         final_message=final_message[0]["text"]
     state["triage_reasoning"]=final_message
-    state["suspicious"] = True
-    state["severity"] = "High"
-    state["confidence_triage"] = 80.0
-    state["signals"] = []
-    state["source_ip"] = state["raw_event"]["source_ip"]
+    clean_message=final_message.strip()
+    if clean_message.startswith("```"):
+        clean_message=re.sub(r'```json|```','',clean_message).strip()
+    try:
+        parsed=json.loads(clean_message)
+        state["suspicious"]=parsed.get("suspicious",True)
+        state["severity"]=parsed.get("severity","High")
+        state["confidence_triage"]=float(parsed.get("confidence",80))
+        state["signals"]=parsed.get("signals",[])
+        state["triage_reasoning"]=parsed.get("reasoning",final_message)
+    except:
+        state["suspicious"]=True
+        state["severity"]="High"
+        state["confidence_triage"]=80.0
+        state["signals"]=[]
+        state["triage_reasoning"]=final_message
+    state["source_ip"]=state["raw_event"]["source_ip"]
     return state
