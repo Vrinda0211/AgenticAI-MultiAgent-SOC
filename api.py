@@ -4,8 +4,13 @@ import sys
 sys.path.append('.')
 from database.db_setup import fetch_all_incidents,fetch_incident
 from graph import pipeline
+from pydantic import BaseModel
+from copilot.soc_copilot import answer_question 
 
 app=FastAPI(title="SOC Copilot API")
+
+class CopilotRequest(BaseModel):
+    question: str
 
 @app.post("/analyze")
 def analyze_event(event:dict):
@@ -35,3 +40,13 @@ def get_incident(incident_id:str):
         return incident
     except Exception as e:
         raise HTTPException(status_code=404,detail=str(e))
+@app.post("/copilot")
+def copilot_endpoint(request: CopilotRequest):
+    try:
+        answer = answer_question(request.question)
+        return {"answer": answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
