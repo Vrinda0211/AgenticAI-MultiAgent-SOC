@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Copilot</title>
+    <style>
+        * 
+        {
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body 
+        {
+            background:#0a0e1a;
+            color:#e2e8f0;
+            font-family:'Courier New', monospace;
+            height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+
+        .header 
+        {
+            background:#0d1224;
+            border-bottom:1px solid #1e3a5f;
+            padding:16px 24px;
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+        .header .dot 
+        {
+            width:10px;
+            height:10px;
+            background:#00ff88;
+            border-radius:50%;
+            animation:pulse 2s infinite;
+        }
+
+        @keyframes pulse 
+        {
+            0%,100% {opacity:1;}
+            50% {opacity:0.3;}
+        }
+
+        .header h1 
+        {
+            font-size:16px;
+            color:#00ff88;
+            letter-spacing:2px;
+            text-transform:uppercase;
+        }
+
+        .header span 
+        {
+            font-size:12px;
+            color:#4a6fa5;
+            margin-left:auto;
+        }
+
+        .chat-container 
+        {
+            flex:1;
+            overflow-y:auto;
+            padding:24px;
+            display:flex;
+            flex-direction:column;
+            gap:16px;
+        }
+
+        .message 
+        {
+            max-width:80%;
+            padding:12px 16px;
+            border-radius:4px;
+            font-size:14px;
+            line-height:1.6;
+        }
+
+        .message.user 
+        {
+            background:#1e3a5f;
+            border-left:3px solid #00aaff;
+            align-self:flex-end;
+            color:#e2e8f0;
+        }
+
+        .message.assistant 
+        {
+            background:#0d1224;
+            border-left:3px solid #00ff88;
+            align-self:flex-start;
+            color:#a8d5b5;
+        }
+
+        .message.assistant pre 
+        {
+            white-space:pre-wrap;
+            font-family:'Courier New', monospace;
+        }
+
+        .message .label 
+        {
+            font-size:10px;
+            letter-spacing:1px;
+            text-transform:uppercase;
+            margin-bottom:6px;
+            opacity:0.6;
+        }
+
+        .typing 
+        {
+            display:none;
+            align-self:flex-start;
+            background:#0d1224;
+            border-left:3px solid #00ff88;
+            padding:12px 16px;
+            border-radius:4px;
+            color:#00ff88;
+            font-size:13px;
+        }
+
+        .typing.visible 
+        {
+            display:block;
+        }
+
+        .input-area 
+        {
+            background:#0d1224;
+            border-top:1px solid #1e3a5f;
+            padding:16px 24px;
+            display:flex;
+            gap:12px;
+        }
+
+        .input-area input 
+        {
+            flex:1;
+            background:#0a0e1a;
+            border:1px solid #1e3a5f;
+            color:#e2e8f0;
+            padding:12px 16px;
+            font-family:'Courier New', monospace;
+            font-size:14px;
+            border-radius:4px;
+            outline:none;
+        }
+
+        .input-area input:focus 
+        {
+            border-color:#00aaff;
+        }
+
+        .input-area input::placeholder 
+        {
+            color:#4a6fa5;
+        }
+
+        .input-area button 
+        {
+            background:#00aaff;
+            color:#0a0e1a;
+            border:none;
+            padding:12px 24px;
+            font-family:'Courier New', monospace;
+            font-size:14px;
+            font-weight:bold;
+            letter-spacing:1px;
+            border-radius:4px;
+            cursor:pointer;
+            text-transform:uppercase;
+        }
+
+        .input-area button:hover 
+        {
+            background:#00ff88;
+        }
+
+        .input-area button:disabled 
+        {
+            background:#1e3a5f;
+            color:#4a6fa5;
+            cursor:not-allowed;
+        }
+
+        .welcome 
+        {
+            text-align:center;
+            padding:40px;
+            color:#4a6fa5;
+        }
+
+        .welcome h2 
+        {
+            color:#00aaff;
+            margin-bottom:12px;
+            font-size:18px;
+        }
+
+        .welcome p 
+        {
+            font-size:13px;
+            line-height:1.8;
+        }
+
+        .welcome .examples 
+        {
+            margin-top:20px;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+        }
+
+        .welcome .example 
+        {
+            background:#0d1224;
+            border:1px solid #1e3a5f;
+            padding:8px 16px;
+            border-radius:4px;
+            font-size:13px;
+            cursor:pointer;
+            color:#00aaff;
+            text-align:left;
+        }
+
+        .welcome .example:hover 
+        {
+            border-color:#00aaff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="dot"></div>
+        <h1>SOC Copilot</h1>
+        <span>CONNECTED TO INCIDENT DATABASE</span>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="welcome" id="welcome">
+            <h2>AI Security Operations Assistant</h2>
+            <p>Ask me anything about your security incidents.<br>I have access to the full incident database.</p>
+            <div class="examples">
+                <div class="example" onclick="sendExample(this)">What are the critical incidents?</div>
+                <div class="example" onclick="sendExample(this)">What should I do about the brute force attacks?</div>
+                <div class="example" onclick="sendExample(this)">Show me all escalated incidents</div>
+                <div class="example" onclick="sendExample(this)">Which IP addresses are most suspicious?</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="typing" id="typing">⬛ Analyzing incident data...</div>
+
+    <div class="input-area">
+        <input type="text" id="questionInput" placeholder="Ask about incidents, attacks, or recommended actions..."/>
+        <button id="sendBtn" onclick="sendQuestion()">Send</button>
+    </div>
+
+    <script>
+        const input=document.getElementById('questionInput');
+        const sendBtn=document.getElementById('sendBtn');
+        const chatContainer=document.getElementById('chatContainer');
+        const typing=document.getElementById('typing');
+
+        input.addEventListener('keypress',(e)=>
+        {
+            if(e.key==='Enter') sendQuestion();
+        });
+
+        function sendExample(el)
+        {
+            input.value=el.textContent;
+            sendQuestion();
+        }
+
+        function addMessage(text,role)
+        {
+            const welcome=document.getElementById('welcome');
+            if(welcome) welcome.remove();
+
+            const msg=document.createElement('div');
+            msg.className=`message ${role}`;
+            const label=document.createElement('div');
+            label.className='label';
+            label.textContent=role==='user'?'▶ Analyst':'◀ SOC Copilot';
+            const content=document.createElement('pre');
+            content.textContent=text;
+            msg.appendChild(label);
+            msg.appendChild(content);
+            chatContainer.appendChild(msg);
+            chatContainer.scrollTop=chatContainer.scrollHeight;
+        }
+
+        async function sendQuestion()
+        {
+            const question=input.value.trim();
+            if(!question) return;
+
+            input.value='';
+            sendBtn.disabled=true;
+            addMessage(question,'user');
+            typing.classList.add('visible');
+            chatContainer.scrollTop=chatContainer.scrollHeight;
+
+            try
+            {
+                const response=await fetch('http://localhost:8000/copilot',
+                {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({question})
+                });
+                const data=await response.json();
+                typing.classList.remove('visible');
+                addMessage(data.answer,'assistant');
+            }
+            catch(err)
+            {
+                typing.classList.remove('visible');
+                addMessage('Error: Could not reach the SOC API. Make sure the server is running.','assistant');
+            }
+
+            sendBtn.disabled=false;
+            input.focus();
+        }
+    </script>
+</body>
+</html>

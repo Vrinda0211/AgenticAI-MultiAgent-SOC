@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore")
 
 load_dotenv()
 
-llm = ChatGroq(model="llama-3.3-70b-versatile",api_key=os.getenv("GROQ_API_KEY"),temperature=0)
+llm=ChatGroq(model="llama-3.1-8b-instant",api_key=os.getenv("GROQ_API_KEY"),temperature=0)
 tools=[mitre_lookup_tool,historical_pattern_tool,incident_history_tool]
 
 system_prompt="""You are a cybersecurity Investigation Agent in a 

@@ -17,7 +17,7 @@ import json
 
 load_dotenv()
 
-llm = ChatGroq(model="llama-3.3-70b-versatile",api_key=os.getenv("GROQ_API_KEY"),temperature=0)
+llm=ChatGroq(model="llama-3.1-8b-instant",api_key=os.getenv("GROQ_API_KEY"),temperature=0)
 tools=[geoip_tool,incident_history_tool,ip_reputation_tool]
 system_prompt = """You are a cybersecurity Triage Agent in a Security Operations Center (SOC).
 
