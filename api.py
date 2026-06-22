@@ -5,9 +5,17 @@ sys.path.append('.')
 from database.db_setup import fetch_all_incidents,fetch_incident
 from graph import pipeline
 from pydantic import BaseModel
-from copilot.soc_copilot import answer_question 
+from copilot.soc_copilot import answer_question
+from fastapi.middleware.cors import CORSMiddleware
 
 app=FastAPI(title="SOC Copilot API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 class CopilotRequest(BaseModel):
     question: str
@@ -47,6 +55,7 @@ def copilot_endpoint(request:CopilotRequest):
         answer=answer_question(request.question)
         return {"answer":answer}
     except Exception as e:
+        print(f"COPILOT ERROR: {e}")
         raise HTTPException(status_code=500,detail=str(e))
     
 if __name__ == "__main__":
