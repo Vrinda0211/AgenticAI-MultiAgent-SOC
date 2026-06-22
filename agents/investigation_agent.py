@@ -1,6 +1,6 @@
 import os
 import sys
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
 from dotenv import load_dotenv
 sys.path.append('.')
@@ -16,11 +16,7 @@ warnings.filterwarnings("ignore")
 
 load_dotenv()
 
-llm=ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=os.getenv("GEMINI_API_KEY"),
-    temperature=0
-)
+llm = ChatGroq(model="llama-3.3-70b-versatile",api_key=os.getenv("GROQ_API_KEY"),temperature=0)
 tools=[mitre_lookup_tool,historical_pattern_tool,incident_history_tool]
 
 system_prompt="""You are a cybersecurity Investigation Agent in a 

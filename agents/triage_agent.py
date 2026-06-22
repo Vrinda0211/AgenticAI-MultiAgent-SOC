@@ -1,6 +1,6 @@
 import os
 import sys
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
 from dotenv import load_dotenv
 sys.path.append('.')
@@ -17,7 +17,7 @@ import json
 
 load_dotenv()
 
-llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash",google_api_key=os.getenv("GEMINI_API_KEY"),temperature=0)
+llm = ChatGroq(model="llama-3.3-70b-versatile",api_key=os.getenv("GROQ_API_KEY"),temperature=0)
 tools=[geoip_tool,incident_history_tool,ip_reputation_tool]
 system_prompt = """You are a cybersecurity Triage Agent in a Security Operations Center (SOC).
 
@@ -57,6 +57,9 @@ triage_agent=create_react_agent(model=llm,tools=tools,prompt=system_prompt)
 def run_triage_agent(state:dict)->dict:
     raw_event=state["raw_event"]
     message=f"Analyse this security event and determin if it is suspicious:{raw_event}"
+
+    geo_result = geoip_tool.invoke({"ip_address": state["source_ip"]})
+    state["country"] = geo_result.get("country", "Unknown")
 
     #result=triage_agent.invoke({"messages":[{"role":"user","content":message}]})
     result = call_with_retry(

@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import sys
 sys.path.append('.')
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
 
 from tools.escalation_tool import escalation_tool
@@ -16,7 +16,7 @@ import json
 
 load_dotenv()
 
-llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash",google_api_key=os.getenv("GEMINI_API_KEY"),temperature=0)
+llm = ChatGroq(model="llama-3.3-70b-versatile",api_key=os.getenv("GROQ_API_KEY"),temperature=0)
 tools=[escalation_tool,remediation_kb_tool]
 system_prompt="""You are a cybersecurity Response Agent in a Security Operations Center (SOC).
 
