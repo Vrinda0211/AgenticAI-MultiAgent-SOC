@@ -62,19 +62,17 @@ pipeline = graph.compile()
 
 if __name__ == "__main__":
     test_state = {
-        # Raw event
+       
         "raw_event": {"source_ip": "10.0.5.41", "log_source": "auth_logs"},
         "source_ip": "10.0.5.41",
         "log_source": "auth_logs",
 
-        # Triage outputs (empty — will be filled by triage agent)
         "suspicious": False,
         "severity": "",
         "confidence_triage": 0.0,
         "signals": [],
         "triage_reasoning": "",
 
-        # Investigation outputs (empty)
         "attack_type": "",
         "primary_mitre_id": "",
         "secondary_mitre_id": "",
@@ -82,23 +80,19 @@ if __name__ == "__main__":
         "confidence_investigation": 0.0,
         "investigation_reasoning": "",
 
-        # Feedback loop
         "retriage_count": 0,
         "retriage_request": "",
 
-        # Response outputs (empty)
         "actions": [],
         "escalate_to_human": False,
         "severity_final": "",
         "response_reasoning": "",
 
-        # Timing (empty — will be filled by wrappers)
         "triage_time": 0.0,
         "investigation_time": 0.0,
         "response_time": 0.0,
         "total_time": 0.0,
 
-        # Metadata
         "incident_id": "",
         "timestamp_processed": ""
     }
