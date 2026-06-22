@@ -32,14 +32,14 @@ def historical_pattern_tool(ip_address:str)->dict:
     if(failed_auth_logs>5):
        
         patterns_found.append('brute_force')
-        target_users = list(set(auth_records["username"]))
+        target_users = list(set(auth_records["username"]))[:3]
         targeted_admin = (auth_records['is_admin'] == True).any()
       
         brute_force = {
         "detected": True,
         "failed_logins": int(failed_auth_logs),
         "targeted_usernames": target_users,
-        "targeted_admin": targeted_admin
+        "targeted_admin": bool(targeted_admin)
         }
     else:
         brute_force = {
@@ -58,8 +58,8 @@ def historical_pattern_tool(ip_address:str)->dict:
         target_ports = port_records["destination_port"].unique().tolist()[:5]
         port_scan={
             "detected":True,
-            "unique_ports_scanned":unique_ports_scanned,
-            "scan_duration_seconds":scan_duration_seconds,
+            "unique_ports_scanned":int(unique_ports_scanned),
+            "scan_duration_seconds":float(scan_duration_seconds),
             "ports_sample":target_ports
         }
     else:
@@ -101,9 +101,9 @@ def historical_pattern_tool(ip_address:str)->dict:
 
             suspicious_login={
             "detected":detected,
-            "failed_before_success":failures_before_success,
-            "successful_logins": successful_login_count,
-            "off_hours_login":off_hours_login,
+            "failed_before_success":int(failures_before_success),
+            "successful_logins": int(successful_login_count),
+            "off_hours_login":bool(off_hours_login),
 
             }
         else:

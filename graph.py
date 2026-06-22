@@ -71,8 +71,8 @@ pipeline = graph.compile()
 if __name__ == "__main__":
     test_state = {
        
-        "raw_event": {"source_ip": "185.220.101.45", "log_source": "auth_logs"},
-        "source_ip": "185.220.101.45",
+        "raw_event": {"source_ip": "194.165.16.72", "log_source": "auth_logs"},
+        "source_ip": "194.165.16.72",
         "log_source": "auth_logs",
 
         "suspicious": False,

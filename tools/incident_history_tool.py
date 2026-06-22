@@ -25,10 +25,10 @@ def incident_history_tool(ip_address:str)->dict:
         successful_auth_logs = (auth_records["event_type"] == "LOGIN_SUCCESS").sum()
         #print(failed_auth_logs)
         selected_auth_events = ["timestamp","event_type","username","is_admin"]
-        auth_events=auth_records[selected_auth_events].to_dict(orient='records')
+        auth_events=auth_records[selected_auth_events].head(5).to_dict(orient='records')
 
         selected_port_events=["timestamp","destination_port","action","connection_state"]
-        port_events=port_records[selected_port_events].to_dict(orient='records')
+        port_events=port_records[selected_port_events].head(5).to_dict(orient='records')
 
         
         countries = list(set(auth_records["country"])|set(port_records["country"]))
@@ -50,9 +50,9 @@ def incident_history_tool(ip_address:str)->dict:
             "failed_logins": int(failed_auth_logs),
             "successful_logins": int(successful_auth_logs),
             "unique_ports_scanned":int(unique_ports_scanned),
-            "countries":countries,
-            "first_seen":first_seen,
-            "last_seen":last_seen,
+            "countries":countries[:3],
+            "first_seen":str(first_seen),
+            "last_seen":str(last_seen),
             "found":True
         }
        
