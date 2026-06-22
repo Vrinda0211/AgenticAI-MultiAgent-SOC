@@ -7,6 +7,8 @@ sys.path.append('.')
 from tools.mitre_lookup_tool import mitre_lookup_tool
 from tools.historical_pattern_tool import historical_pattern_tool
 from tools.incident_history_tool import incident_history_tool
+from utils.rate_limit_handler import call_with_retry  
+
 import warnings
 import re
 import json
@@ -70,7 +72,11 @@ Triage Assessment: {state['triage_reasoning']}
 
 Determine the attack type, gather evidence, and map to MITRE ATT&CK.
 """
-    result=investigation_agent.invoke({"messages":[{"role":"user","content":message}]})
+    #result=investigation_agent.invoke({"messages":[{"role":"user","content":message}]})
+    result = call_with_retry(
+        investigation_agent,
+        {"messages": [{"role": "user", "content": message}]}
+    )
     final_message=result["messages"][-1].content
     if isinstance(final_message,list):
         final_message=final_message[0]["text"]
