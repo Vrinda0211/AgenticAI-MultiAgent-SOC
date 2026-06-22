@@ -62,11 +62,12 @@ The JSON must follow this exact structure:
 
 response_agent=create_react_agent(model=llm,tools=tools,prompt=system_prompt)
 def run_response_agent(state:dict)->dict:
+   
     attack_type=state.get("attack_type","Unknown")
-    evidence=state.get("evidence","")
     severity=state.get("severity","High")
     confidence_investigation=state.get("confidence_investigation",80.0)
-    investigation_reasoning=state.get("investigation_reasoning","")
+    evidence=state.get("evidence","")[:400]
+    investigation_reasoning=state.get("investigation_reasoning","")[:400]
     message=f"""Investigate and respond to this confirmed security incident:
     Attack Type:{attack_type}
     Evidence:{evidence}
@@ -92,6 +93,7 @@ def run_response_agent(state:dict)->dict:
        state["severity_final"] = parsed.get("severity_final", severity)
        state["response_reasoning"] = parsed.get("response_reasoning", final_message)
     except:
+       print("JSON parse failed — using defaults")
        state["actions"] = []
        state["escalate_to_human"] = False
        state["severity_final"] = severity

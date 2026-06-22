@@ -61,10 +61,11 @@ Return your response as valid JSON only, with no extra text before or after:
 investigation_agent = create_react_agent(model=llm, tools=tools, prompt=system_prompt)
 
 def run_investigation_agent(state:dict)->dict:
+    triage_summary = state.get("triage_reasoning", "")[:300]
     message=f"""
 Investigate this security event:
 Source IP: {state['source_ip']}
-Triage Assessment: {state['triage_reasoning']}
+Triage Assessment: {triage_summary}
 
 Determine the attack type, gather evidence, and map to MITRE ATT&CK.
 """
@@ -88,6 +89,7 @@ Determine the attack type, gather evidence, and map to MITRE ATT&CK.
         state["evidence"]=parsed.get("evidence","")
         state["confidence_investigation"]=float(parsed.get("confidence_score",100))
     except:
+        print("JSON parse failed — using defaults")
         state["investigation_reasoning"]=final_message
         state["attack_type"]="Unknown"
         state["primary_mitre_id"]=""

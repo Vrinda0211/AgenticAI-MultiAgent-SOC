@@ -18,6 +18,9 @@ def timed_triage(state: dict)->dict:
     return state
 
 def timed_investigate(state: dict)->dict:
+    if len(state.get("triage_reasoning", "")) > 500:
+        state["triage_reasoning"] = state["triage_reasoning"][:500] + "...[truncated]"
+
     start=time.time()
     state=run_investigation_agent(state)
     state['investigation_time']=round(time.time()-start,2)
@@ -25,6 +28,11 @@ def timed_investigate(state: dict)->dict:
     return state
 
 def timed_response(state: dict)->dict:
+    if len(state.get("investigation_reasoning", "")) > 1000:
+        state["investigation_reasoning"] = state["investigation_reasoning"][:1000] + "...[truncated]"
+    if len(state.get("evidence", "")) > 500:
+        state["evidence"] = state["evidence"][:500] + "...[truncated]"
+
     start=time.time()
     state=run_response_agent(state)
     state["response_time"]=round(time.time()-start,2)
@@ -63,8 +71,8 @@ pipeline = graph.compile()
 if __name__ == "__main__":
     test_state = {
        
-        "raw_event": {"source_ip": "10.0.5.41", "log_source": "auth_logs"},
-        "source_ip": "10.0.5.41",
+        "raw_event": {"source_ip": "185.220.101.45", "log_source": "auth_logs"},
+        "source_ip": "185.220.101.45",
         "log_source": "auth_logs",
 
         "suspicious": False,
