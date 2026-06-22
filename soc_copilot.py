@@ -32,7 +32,3 @@ def answer_question(question:str)->str:
     Analyst question: {question}"""
     response=llm.invoke(prompt)
     return response.content
-
-if __name__ == "__main__":
-    print(answer_question("What are the critical incidents?"))
-    print(answer_question("What should I do about the brute force attacks?"))
