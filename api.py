@@ -27,10 +27,10 @@ def get_incidents():
     return incidents
 
 @app.get("/incidents/{incident_id}")
-def get_incident(incident_id:int):
+def get_incident(incident_id:str):
     try:
         incident=fetch_incident(incident_id)
-        if incident is None:
+        if not incident:
             raise HTTPException(status_code=404,detail="Incident not found")
         return incident
     except Exception as e:
