@@ -7,6 +7,7 @@ from langgraph.prebuilt import create_react_agent
 
 from tools.escalation_tool import escalation_tool
 from tools.remediation_kb_tool import remediation_kb_tool
+from utils.rate_limit_handler import call_with_retry  
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -73,7 +74,11 @@ def run_response_agent(state:dict)->dict:
     Investigation Confidence:{confidence_investigation}
     Investigation Summary:{investigation_reasoning}
     Generate prioritized remediation actions, decide on escalation, and assign a final severity."""
-    result=response_agent.invoke({"messages":[{"role":"user","content":message}]})
+    #result=response_agent.invoke({"messages":[{"role":"user","content":message}]})
+    result = call_with_retry(
+        response_agent,
+        {"messages": [{"role": "user", "content": message}]}
+    )
     final_message=result["messages"][-1].content
     if isinstance(final_message,list):
         final_message=final_message[0]["text"]

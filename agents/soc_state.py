@@ -29,6 +29,12 @@ class SOCState(TypedDict):
     #Metadata/ Bookkeeping fields
     incident_id : str
     timestamp_processed : datetime
+    #Timestamps fields
+    triage_time : float
+    investigation_time : float
+    response_time : float
+    total_time : float
+     
 
 
     

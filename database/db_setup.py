@@ -24,7 +24,8 @@ def create_table():
                    evidence TEXT,confidence_investigation REAL,
                    investigation_reasoning TEXT, actions TEXT,
                    escalate_to_human INTEGER,severity_final TEXT,
-                   response_reasoning TEXT,retriage_count INTEGER)
+                   response_reasoning TEXT,retriage_count INTEGER,
+                   triage_time REAL,investigation_time REAL,response_time REAL,total_time REAL)
             """)
     conn.commit()
     conn.close()
@@ -37,7 +38,7 @@ def save_incidents(state:dict):
 
     cursor.execute(""" 
         INSERT OR REPLACE INTO incidents VALUES(
-            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?       
+            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?       
             )
         """, (
             state.get("incident_id"),
@@ -59,7 +60,11 @@ def save_incidents(state:dict):
             1 if state.get("escalate_to_human") else 0,   
             state.get("severity_final"),
             state.get("response_reasoning"),
-            state.get("retriage_count", 0)
+            state.get("retriage_count", 0),
+            state.get("triage_time",0.0),
+            state.get("investigation_time",0.0),
+            state.get("response_time",0.0),
+            state.get("total_time",0.0)
             )
             )
 

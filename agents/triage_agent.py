@@ -8,6 +8,7 @@ sys.path.append('.')
 from tools.geoip_tool import geoip_tool
 from tools.incident_history_tool import incident_history_tool
 from tools.ip_reputation_tool import ip_reputation_tool
+from utils.rate_limit_handler import call_with_retry  
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -56,7 +57,13 @@ triage_agent=create_react_agent(model=llm,tools=tools,prompt=system_prompt)
 def run_triage_agent(state:dict)->dict:
     raw_event=state["raw_event"]
     message=f"Analyse this security event and determin if it is suspicious:{raw_event}"
-    result=triage_agent.invoke({"messages":[{"role":"user","content":message}]})
+
+    #result=triage_agent.invoke({"messages":[{"role":"user","content":message}]})
+    result = call_with_retry(
+        triage_agent,
+        {"messages": [{"role": "user", "content": message}]}
+    )
+
     final_message=result["messages"][-1].content
     if isinstance(final_message, list):
         final_message=final_message[0]["text"]
