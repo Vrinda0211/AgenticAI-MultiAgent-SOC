@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg-deep:    #060b18;
+            --bg-panel:   #0b1120;
+            --bg-card:    #0f1929;
+            --border:     #1a2d4a;
+            --border-lit: #1e4080;
+            --accent:     #0ea5e9;
+            --accent-dim: #0369a1;
+            --green:      #10b981;
+            --amber:      #f59e0b;
+            --red:        #ef4444;
+            --text-hi:    #e2eaf6;
+            --text-mid:   #7a9bc4;
+            --text-lo:    #3a5a7a;
+            --mono:       'JetBrains Mono', monospace;
+            --sans:       'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-deep);
+            color: var(--text-hi);
+            font-family: var(--sans);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── TOP BAR ── */
+        .topbar {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 0 28px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-ring {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: ring-pulse 3s ease-in-out infinite;
+        }
+
+        .status-ring::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: dot-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes ring-pulse {
+            0%, 100% { border-color: var(--green); box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+            50% { border-color: #34d399; box-shadow: 0 0 0 6px rgba(16,185,129,0.1); }
+        }
+
+        @keyframes dot-pulse {
+            0%, 100% { background: var(--green); }
+            50% { background: #34d399; }
+        }
+
+        .brand {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-hi);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .brand span {
+            color: var(--accent);
+        }
+
+        .divider-v {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 8px;
+        }
+
+        .topbar-meta {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-lo);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--green);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: blink 1.4s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .clock {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-mid);
+            letter-spacing: 1px;
+        }
+
+      
+        .layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            padding: 20px 0;
+        }
+
+        .sidebar-label {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text-lo);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 0 20px 12px;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 20px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-mid);
+            font-family: var(--sans);
+            font-size: 13px;
+            font-weight: 400;
+            text-align: left;
+            width: 100%;
+            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .nav-btn:hover {
+            background: rgba(14, 165, 233, 0.06);
+            color: var(--text-hi);
+            border-left-color: var(--border-lit);
+        }
+
+        .nav-btn.active {
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+
+        .nav-btn.active .nav-icon {
+            opacity: 1;
+        }
+
+        .nav-tag {
+            margin-left: auto;
+            font-family: var(--mono);
+            font-size: 9px;
+            background: rgba(14,165,233,0.15);
+            color: var(--accent);
+            padding: 2px 6px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-btn.active .nav-tag {
+            background: rgba(14,165,233,0.25);
+        }
+
+        .sidebar-section {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--bg-deep);
+        }
+
+        /* ── PANEL HEADER ── */
+        .panel-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-panel);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .panel-title {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-mid);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .panel-title span {
+            color: var(--text-hi);
+            font-weight: 600;
+        }
+
+        .breadcrumb-sep {
+            color: var(--text-lo);
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        .panel-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-mid);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 5px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.15s;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ── IFRAME WRAPPER ── */
+        .iframe-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .dashboard-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+   
+        .welcome-screen {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .welcome-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 640px;
+            width: 100%;
+            padding: 0 24px;
+        }
+
+        .welcome-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .welcome-card:hover {
+            border-color: var(--accent);
+            background: rgba(14,165,233,0.06);
+            transform: translateY(-2px);
+        }
+
+        .welcome-card-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-card-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-hi);
+            margin-bottom: 4px;
+        }
+
+        .welcome-card-sub {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text-lo);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .welcome-title {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-lo);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+       
+        .main::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.03) 2px,
+                rgba(0,0,0,0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="topbar">
+    <div class="topbar-left">
+        <div class="status-ring"></div>
+        <div class="brand">SOC <span>//</span> PLATFORM</div>
+        <div class="divider-v"></div>
+        <div class="topbar-meta">Multi-Agent Security Operations</div>
+    </div>
+    <div class="topbar-right">
+        <div class="live-badge">
+            <div class="live-dot"></div>
+            Live
+        </div>
+        <div class="divider-v"></div>
+        <div class="clock" id="clock">--:--:--</div>
+    </div>
+</div>
+
+<div class="layout">
+
+  
+    <div class="sidebar">
+        <div class="sidebar-label">Dashboards</div>
+
+        <button class="nav-btn active" onclick="loadDash(0, this)">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            Geographic Threat Map
+            <span class="nav-tag">GEO</span>
+        </button>
+
+        <button class="nav-btn" onclick="loadDash(1, this)">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 9h18M9 21V9"/>
+            </svg>
+            Total Attack
+            <span class="nav-tag">TA</span>
+        </button>
+
+        <button class="nav-btn" onclick="loadDash(2, this)">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Time Taken
+            <span class="nav-tag">TT</span>
+        </button>
+
+        <button class="nav-btn" onclick="loadDash(3, this)">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            Dashboard 3
+            <span class="nav-tag">D3</span>
+        </button>
+
+        <button class="nav-btn" onclick="loadDash(4, this)">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            Dashboard 4
+            <span class="nav-tag">D4</span>
+        </button>
+
+        <button class="nav-btn" onclick="loadDash(5, this)">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+            </svg>
+            Dashboard 5
+            <span class="nav-tag">D5</span>
+        </button>
+
+        <div class="sidebar-section">
+            <div class="sidebar-label">System</div>
+            <button class="nav-btn" onclick="window.open('http://localhost:3000','_blank')">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                Open Grafana
+            </button>
+        </div>
+    </div>
+
+   
+    <div class="main" id="main">
+
+        
+        <div class="panel-header">
+            <div class="panel-title">
+                Dashboards <span class="breadcrumb-sep">/</span>
+                <span id="panel-name">Geographic Threat Map</span>
+            </div>
+            <div class="panel-actions">
+                <button class="action-btn" onclick="reloadFrame()">↺ Refresh</button>
+                <button class="action-btn" onclick="openFull()">⤢ Full Screen</button>
+            </div>
+        </div>
+
+        
+        <div class="iframe-wrapper" id="iframe-wrapper">
+            <iframe
+                id="grafana-frame"
+                class="dashboard-frame"
+                src="http://localhost:3000/public-dashboards/e28e01a92a4b4ee5af23de04f74516f3"
+                allowfullscreen>
+            </iframe>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const dashboards = [
+        {
+            name: "Geographic Threat Map",
+            url:  "http://localhost:3000/public-dashboards/e28e01a92a4b4ee5af23de04f74516f3"
+        },
+        {
+            name: "Total Attack",
+            url:  "http://localhost:3000/public-dashboards/77a27a4d5bc2405584bb5b953671784c"
+        },
+        {
+            name: "Time taken ",
+            url:  "http://localhost:3000/public-dashboards/1870bf2894684549b1ef4fa8043eb5fd"
+        },
+        {
+            name: "Dashboard 3",
+            url:  "http://localhost:3000/public-dashboards/REPLACE_WITH_URL_3"
+        },
+        {
+            name: "Dashboard 4",
+            url:  "http://localhost:3000/public-dashboards/REPLACE_WITH_URL_4"
+        },
+        {
+            name: "Dashboard 5",
+            url:  "http://localhost:3000/public-dashboards/REPLACE_WITH_URL_5"
+        }
+    ]
+
+    let currentIndex = 0
+
+    function loadDash(index, btn) {
+        currentIndex = index
+        const dash = dashboards[index]
+
+        // Update iframe
+        document.getElementById('grafana-frame').src = dash.url
+
+        // Update header
+        document.getElementById('panel-name').textContent = dash.name
+
+        // Update active button
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+    }
+
+    function reloadFrame() {
+        const frame = document.getElementById('grafana-frame')
+        frame.src = frame.src
+    }
+
+    function openFull() {
+        window.open(dashboards[currentIndex].url, '_blank')
+    }
+
+    // Live clock
+    function updateClock() {
+        const now = new Date()
+        const h = String(now.getHours()).padStart(2, '0')
+        const m = String(now.getMinutes()).padStart(2, '0')
+        const s = String(now.getSeconds()).padStart(2, '0')
+        document.getElementById('clock').textContent = `${h}:${m}:${s}`
+    }
+    updateClock()
+    setInterval(updateClock, 1000)
+</script>
+
+</body>
+</html>

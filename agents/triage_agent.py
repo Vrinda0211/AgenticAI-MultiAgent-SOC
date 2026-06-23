@@ -60,6 +60,8 @@ def run_triage_agent(state:dict)->dict:
 
     geo_result = geoip_tool.invoke({"ip_address": state["source_ip"]})
     state["country"] = geo_result.get("country", "Unknown")
+    state["city"] = geo_result.get("city", "Unknown")
+
 
     #result=triage_agent.invoke({"messages":[{"role":"user","content":message}]})
     result = call_with_retry(

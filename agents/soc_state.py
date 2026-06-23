@@ -4,6 +4,7 @@ class SOCState(TypedDict):
     #Raw event info
     raw_event : Dict
     country : str
+    city : str
     source_ip : str
     log_source : str
     #Triage agent outputs

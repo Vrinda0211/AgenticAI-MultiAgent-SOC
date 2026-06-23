@@ -2,7 +2,7 @@ import sqlite3
 import os
 import json
 
-DB_PATH=os.path.join(os.path.dirname(__file__),"soc_incidents_with_time.db")
+DB_PATH=os.path.join(os.path.dirname(__file__),"soc_incidents_with_time_city.db")
 
 def get_connection():
     conn=sqlite3.connect(DB_PATH)
@@ -16,7 +16,7 @@ def create_table():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS incidents(
         incident_id TEXT PRIMARY KEY,timestamp_processed TEXT,
-                   source_ip TEXT,country TEXT,log_source TEXT,
+                   source_ip TEXT,country TEXT,city TEXT,log_source TEXT,
                    suspicious INTEGER, severity TEXT,
                    confidence_triage REAL,signals TEXT,
                    triage_reasoning TEXT,attack_type TEXT,
@@ -38,13 +38,14 @@ def save_incidents(state:dict):
 
     cursor.execute(""" 
         INSERT OR REPLACE INTO incidents VALUES(
-            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?       
+            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?       
             )
         """, (
             state.get("incident_id"),
             str(state.get("timestamp_processed")),
             state.get("source_ip"),
             state.get("country","Unknown"),
+            state.get("city","Unknown"),
             state.get("log_source"),
             1 if state.get("suspicious") else 0,          
             state.get("severity"),
@@ -98,4 +99,4 @@ def fetch_all_incidents()->list:
         return[dict(row) for row in rows]
     
 if __name__ == "__main__":
-        create_table()
+        create_table() 

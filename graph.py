@@ -67,3 +67,4 @@ def route_after_investigation(state: dict) -> str:
 graph.add_conditional_edges("investigation", route_after_investigation)
 
 pipeline = graph.compile()
+
