@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg-deep:  #060b18;
+            --bg-panel: #0b1120;
+            --bg-card:  #0f1929;
+            --border:   #1a2d4a;
+            --accent:   #0ea5e9;
+            --green:    #10b981;
+            --text-hi:  #e2eaf6;
+            --text-mid: #7a9bc4;
+            --text-lo:  #3a5a7a;
+            --mono:     'JetBrains Mono', monospace;
+            --sans:     'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-deep);
+            color: var(--text-hi);
+            font-family: var(--sans);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 0 28px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .status-ring {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: ring-pulse 3s ease-in-out infinite;
+        }
+
+        .status-ring::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: dot-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes ring-pulse {
+            0%, 100% { border-color: var(--green); box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+            50% { border-color: #34d399; box-shadow: 0 0 0 6px rgba(16,185,129,0.1); }
+        }
+
+        @keyframes dot-pulse {
+            0%, 100% { background: var(--green); }
+            50% { background: #34d399; }
+        }
+
+        .brand {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-hi);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .brand span { color: var(--accent); }
+
+        .divider-v {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 8px;
+        }
+
+        .topbar-meta {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-lo);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--green);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: blink 1.4s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .clock {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-mid);
+            letter-spacing: 1px;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 48px;
+            padding: 40px;
+        }
+
+        .hero {
+            text-align: center;
+        }
+
+        .hero-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-lo);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .hero-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-hi);
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .hero-title span { color: var(--accent); }
+
+        .hero-sub {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-lo);
+            letter-spacing: 1px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 720px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 32px 28px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            background: rgba(14, 165, 233, 0.06);
+            transform: translateY(-3px);
+        }
+
+        .card:hover::before { transform: scaleX(1); }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--accent);
+        }
+
+        .card-tag {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--accent);
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            padding: 3px 8px;
+            border-radius: 2px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+
+        .card-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-hi);
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-mid);
+            line-height: 1.6;
+        }
+
+        .card-arrow {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-lo);
+            margin-top: auto;
+            letter-spacing: 1px;
+            transition: color 0.2s;
+        }
+
+        .card:hover .card-arrow { color: var(--accent); }
+
+        .footer {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-lo);
+            letter-spacing: 1px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="status-ring"></div>
+    <div class="brand">SOC <span>//</span> PLATFORM</div>
+    <div class="divider-v"></div>
+    <div class="topbar-meta">Multi-Agent Security Operations</div>
+    <div class="topbar-right">
+        <div class="live-badge">
+            <div class="live-dot"></div>
+            Live
+        </div>
+        <div class="divider-v"></div>
+        <div class="clock" id="clock">--:--:--</div>
+    </div>
+</div>
+
+<div class="main">
+
+    <div class="hero">
+        <div class="hero-label">Agentic AI — Security Operations Center</div>
+        <div class="hero-title">Select a <span>Module</span></div>
+        <div class="hero-sub">Triage · Investigate · Respond · Analyze</div>
+    </div>
+
+    <div class="cards">
+
+        <a class="card" href="database/soc_dashboard.html">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M3 9h18M9 21V9"/>
+                </svg>
+            </div>
+            <div class="card-tag">Dashboards</div>
+            <div class="card-name">SOC Dashboard</div>
+            <div class="card-desc">Live incident monitoring, MITRE ATT&CK landscape, agent health metrics, and geographic threat visualization.</div>
+            <div class="card-arrow">Open Dashboard →</div>
+        </a>
+
+        <a class="card" href="chat.html">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+            </div>
+            <div class="card-tag">AI Assistant</div>
+            <div class="card-name">SOC Copilot</div>
+            <div class="card-desc">Natural language interface to query incidents, get remediation advice, and investigate security events in real time.</div>
+            <div class="card-arrow">Open Copilot →</div>
+        </a>
+
+    </div>
+
+    <div class="footer">Powered by LangGraph · Groq · MITRE ATT&CK · SQLite</div>
+
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date()
+        const h = String(now.getHours()).padStart(2, '0')
+        const m = String(now.getMinutes()).padStart(2, '0')
+        const s = String(now.getSeconds()).padStart(2, '0')
+        document.getElementById('clock').textContent = `${h}:${m}:${s}`
+    }
+    updateClock()
+    setInterval(updateClock, 1000)
+</script>
+
+</body>
+</html>
